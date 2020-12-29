@@ -1,16 +1,19 @@
-
 const express = require('express');
 const session = require('express-session');
-
+const store = require('connect-pg-simple');
 const app = express();
 
 app.set('view engine', 'pug');
 
-app.use(session({
-  secret: 'a5d63fc5-17a5-459c-b3ba-6d81792158fc',
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(
+  session({
+    // cookie: { secure: true },
+    store: new (store(session))(),
+    secret: 'a5d63fc5-17a5-459c-b3ba-6d81792158fc',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 app.use((req, res, next) => {
   let { history } = req.session;
@@ -25,7 +28,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
 
 app.get('/', (req, res) => {
   res.render('index', { title: 'Home', history: req.session.history });
